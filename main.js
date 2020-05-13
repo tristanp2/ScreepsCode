@@ -6,7 +6,6 @@ StructureContainer.prototype.memory = undefined;
 
 module.exports.loop = function () {
     console.log('------------TICK START-----------');
-    console.log('test');
     global.username = 'tpart';
     var num_harvesters = 6;
     var num_builders = 6;
