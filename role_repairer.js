@@ -72,8 +72,8 @@ var roleRepairer = {
                 moveResult = creep.moveTo(source);
             }
 
-            console.log('move result: ' + moveResult);
         }
+        console.log('move result: ' + moveResult);
     }
 };
 
