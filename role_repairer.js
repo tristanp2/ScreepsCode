@@ -60,16 +60,19 @@ var roleRepairer = {
             var result;
             var source = Game.getObjectById(creep.memory.source_id);
             var container = Game.getObjectById(source.memory.container_id);
+            let moveResult;
             if(container && container.store[RESOURCE_ENERGY] > 0){
                 var result = creep.withdraw(container, RESOURCE_ENERGY);
                 if(result == ERR_NOT_IN_RANGE){
                     //creep.say('container!');
-                    creep.moveTo(container);
+                    moveResult = creep.moveTo(container);
                 }
             }
             else if(creep.harvest(source) == ERR_NOT_IN_RANGE) {
-                result = creep.moveTo(source);
+                moveResult = creep.moveTo(source);
             }
+
+            console.log('move result: ' + moveResult);
         }
     }
 };
