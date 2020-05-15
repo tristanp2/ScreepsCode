@@ -1,0 +1,24 @@
+{
+  "name": "screepscode",
+  "version": "1.0.0",
+  "description": "",
+  "main": "main.js",
+  "dependencies": {
+    "@types/lodash": "^4.14.150",
+    "@types/screeps": "^3.1.2"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/tristanp2/ScreepsCode.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/tristanp2/ScreepsCode/issues"
+  },
+  "homepage": "https://github.com/tristanp2/ScreepsCode#readme"
+}
