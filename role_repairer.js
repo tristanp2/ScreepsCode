@@ -3,6 +3,7 @@ var source_manager = require('source_handling');
 var roleRepairer = {
     /** @param {Creep} creep **/
     run: function(creep, room_info, room_memory) {
+        var moveResult;
         source_manager.get_source(creep, room_info);
         if (!creep.memory.job_id || (room_info.urgent_repair > 0 && !creep.memory.urgent)) {
             var job = room_info.repairsQ.dequeue();
@@ -47,7 +48,7 @@ var roleRepairer = {
 	            var job = Memory.active_jobs[creep.memory.job_id];
 	            var target = Game.getObjectById(job.id);
                 if (creep.repair(target) == ERR_NOT_IN_RANGE) {
-	                creep.moveTo(target);
+	                moveResult = creep.moveTo(target);
 	            }
                 if (target.hits >= job.completion) {
                     delete Memory.active_jobs[job.id];
@@ -60,7 +61,6 @@ var roleRepairer = {
             var result;
             var source = Game.getObjectById(creep.memory.source_id);
             var container = Game.getObjectById(source.memory.container_id);
-            let moveResult;
             if(container && container.store[RESOURCE_ENERGY] > 0){
                 var result = creep.withdraw(container, RESOURCE_ENERGY);
                 if(result == ERR_NOT_IN_RANGE){
