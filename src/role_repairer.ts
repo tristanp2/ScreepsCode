@@ -1,4 +1,5 @@
 var source_manager = require('source_handling');
+var util = require('utilities');
 
 var roleRepairer = {
     /** @param {Creep} creep **/
@@ -55,7 +56,14 @@ var roleRepairer = {
                     creep.memory.job_id = 0;   
                     creep.memory.urgent = false;
 	            }
-	        }
+            }
+            else {
+                let pos = util.get_most_open_adjacent_pos(creep.pos);
+                if(pos != creep.pos) {
+                    creep.moveTo(pos);
+                    console.log("creep moving to emptier position");
+                }
+            }
         }
         else {
             var result;

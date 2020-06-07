@@ -8,7 +8,7 @@
  */
 
 var utilities = {
-    get_most_open_adjacent_pos: function(pos){
+    get_most_open_adjacent_pos: function(pos) {
         var adj_info = this.get_adjacent_pos_info(pos);
         var max = 0;
         var best_index = 0;
@@ -29,18 +29,14 @@ var utilities = {
         for(var i in adjacent){
             var p = adjacent[i];
             var p_adjacent = this.get_adjacent_pos(p);
-            var num_open = 0;
-            for(var j in p_adjacent){
-                if(Game.map.getTerrainAt(p_adjacent[j]) != 'wall'){
-                    num_open++;
-                }
-            }
+            var num_open = p_adjacent.length;
             ret.push({pos: p, num_open: num_open});
         }
         return ret;
     },
     get_adjacent_pos: function(pos){
         var room = Game.rooms[pos.roomName];
+        var terrain = new Room.Terrain(pos.roomName); 
         var west = room.getPositionAt(pos.x - 1, pos.y);
         var east = room.getPositionAt(pos.x + 1, pos.y);
         var north = room.getPositionAt(pos.x, pos.y - 1);
@@ -53,9 +49,9 @@ var utilities = {
 
         var ret = [west,east,north,south, nw, ne, sw, se];
         for(var i in ret){
-            var pos = ret[i];
-            if(Game.map.getTerrainAt(pos) == 'wall'){
-                ret.splice(i,1);
+            let p = ret[i];
+            if(terrain.get(p.x, p.y) == TERRAIN_MASK_WALL){
+                ret.splice(parseInt(i),1);
             }
         }
         return ret;
