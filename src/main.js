@@ -1,11 +1,11 @@
 var roomBehaviour = require('room_behaviour');
-var utilities = require('utilities');
+var utils = require('utilities');
 Source.prototype.memory = undefined;
 StructureContainer.prototype.memory = undefined;
 
 
 module.exports.loop = function () {
-    console.log('------------TICK START-----------');
+    utils.log('------------TICK START-----------');
     global.username = 'tpart';
     var num_harvesters = 6;
     var num_builders = 6;
@@ -27,7 +27,7 @@ module.exports.loop = function () {
         Memory.reserve_input = '';
     }
     else if(Memory.reserve_input != ''){
-        console.log('Reserve input found');
+        utils.log('Reserve input found');
         Memory.to_reserve.push(Memory.reserve_input);
         Memory.reserve_input = '';
     }
@@ -79,7 +79,7 @@ module.exports.loop = function () {
             }
     }
     for(var roomName in Game.rooms){
-        console.log('------------' + roomName + ' START-----------');
+        utils.log('------------' + roomName + ' START-----------');
         var room = Game.rooms[roomName];
         room.spawn = _.filter(Game.spawns, (spawn) => spawn.room.name == roomName)[0];
         room.creeps = room.find(FIND_MY_CREEPS);
@@ -198,7 +198,7 @@ module.exports.loop = function () {
         }
         Memory.cpu_avg = used*alpha + Memory.cpu_avg*(1-alpha);
     }
-    console.log('avg cpu usage: ' + Memory.cpu_avg);
-    console.log('------------TICK END-----------');
-    console.log();
+    utils.log('avg cpu usage: ' + Memory.cpu_avg);
+    utils.log('------------TICK END-----------');
+    utils.log();
 }

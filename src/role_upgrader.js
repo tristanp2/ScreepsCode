@@ -1,4 +1,5 @@
 var source_manager = require('source_handling');
+var utils = require('utilities');
 
 var roleUpgrader = {
 

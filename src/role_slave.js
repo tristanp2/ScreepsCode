@@ -1,4 +1,6 @@
 var source_manager = require('source_handling');
+var utils = require('utilities');
+
 var roleSlave = {
     run: function(creep, room_info) {
         if(!creep.memory.target_id){

@@ -1,3 +1,5 @@
+var utils = require('utilities');
+
 var source_manager = {
     get_source: function(creep, room_info){
         var room = Game.rooms[room_info.room_name];
@@ -29,8 +31,8 @@ var source_manager = {
                 new_source.memory.workers++;
                 creep.memory.source_id = new_source.id;
                 if(new_source.memory.container_id)   creep.memory.container_id = new_source.memory.container_id;
-                console.log("Switching from " + source.id +  " to " + new_source.id);
-                console.log("Old: " + source.memory.workers + " New: " + new_source.memory.workers + " max_per_source: " + max_per_source);
+                utils.log("Switching from " + source.id +  " to " + new_source.id);
+                utils.log("Old: " + source.memory.workers + " New: " + new_source.memory.workers + " max_per_source: " + max_per_source);
             }
             else if(!source){
                 creep.memory.source_id = 0;

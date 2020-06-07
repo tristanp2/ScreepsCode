@@ -1,4 +1,5 @@
 var source_manager = require('source_handling');
+var utils = require('utilities');
 
 var roleRepairer = {
     /** @param {Creep} creep **/
@@ -73,7 +74,7 @@ var roleRepairer = {
             }
 
         }
-        console.log('move result: ' + moveResult);
+        utils.log('move result: ' + moveResult);
     }
 };
 

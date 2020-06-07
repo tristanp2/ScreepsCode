@@ -1,4 +1,6 @@
 var source_manager = require('source_handling');
+var utils = require('utilities');
+
 var roleHarvester = {
 
     /** @param {Creep} creep **/
@@ -16,6 +18,7 @@ var roleHarvester = {
             var source = Game.getObjectById(creep.memory.source_id);
             var container = Game.getObjectById(source.memory.container_id);
             if(room_info.dropped_resource.length > 0){
+                utils.log('picking up dropped resource');
                 var resource = room_info.dropped_resource[0];
                 if(creep.pickup(resource) == ERR_NOT_IN_RANGE){
                     creep.moveTo(resource);

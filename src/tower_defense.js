@@ -1,8 +1,10 @@
+var utils = require('utilities');
+
 var tower_defense = {
     run: function(tower){
-        console.log('tower defense');
+        utils.log('tower defense');
         if(!tower.memory.target_id){
-            console.log('finding target');
+            utils.log('finding target');
             var hostiles = tower.room.find(FIND_HOSTILE_CREEPS);
             if(hostiles.length < 1)
                 return;
@@ -11,7 +13,7 @@ var tower_defense = {
             }
         }
         else{
-            console.log('targeting');
+            utils.log('targeting');
             var target = Game.getObjectById(tower.memory.target_id);
             if(target && target.hits > 0){
                 tower.attack(target);

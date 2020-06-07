@@ -1,9 +1,11 @@
+var utils = require('utilities');
+
 var Spawner = {
 	run: function(spawn, spawn_nums, room_info){
 	    this.available = spawn.room.energyAvailable;
 	    this.capacity = spawn.room.energyCapacityAvailable;
-        console.log(spawn.room.name + ' capacity: ' + this.capacity);
-        console.log(spawn.room.name + ' available ' + this.available);
+        utils.log(spawn.room.name + ' capacity: ' + this.capacity);
+        utils.log(spawn.room.name + ' available ' + this.available);
         
         this.spawn = spawn;
         
@@ -24,7 +26,7 @@ var Spawner = {
         this.current_tier = spawn.memory.current_tier;
         if(!spawn.memory.recover){
             if(!spawn.memory.cost_threshold){
-                console.log('getting thresh');
+                utils.log('getting thresh');
                 this.get_threshold();
             }
             else if(spawn.memory.current_tier < CreepBodies.max_tier && this.capacity > spawn.memory.cost_threshold){
@@ -34,14 +36,14 @@ var Spawner = {
                 this.get_threshold();
             }
             else if(this.capacity < spawn.memory.cost_threshold){
-                console.log('should decrease');
+                utils.log('should decrease');
             }
         }
-        console.log(spawn.name + ' tier: ' + this.current_tier);
+        utils.log(spawn.name + ' tier: ' + this.current_tier);
         var next_spawn = spawn.memory.next_spawn;
         
         if(!next_spawn && !spawn.spawning){
-            console.log('attempting to set next spawn for ' + spawn.room.name + ': ' + spawn.name);
+            utils.log('attempting to set next spawn for ' + spawn.room.name + ': ' + spawn.name);
             var next_role;
             var mem = {};
             if(room_info.num_soldiers < spawn_nums.soldiers && this.can_create('slave'))
@@ -65,16 +67,17 @@ var Spawner = {
             }
             else if(spawn.room.memory.reserve_targets.length > 0 && this.can_create('reserver')){
                 mem.target_room = spawn.room.memory.reserve_targets.pop();
+                mem.origin_room = spawn.room.name;
                 next_role = 'reserver';
             }
             
             if(next_role){
                 mem.role = next_role;
                 this.prepare_next(next_role, mem);
-                console.log('next spawn set to: ' + next_role);
+                utils.log('next spawn set to: ' + next_role);
             }
             else{
-                console.log('next spawn not set');
+                utils.log('next spawn not set');
             }
         }
         else if(next_spawn && BodyCost(next_spawn.body) <= spawn.room.energyAvailable){
@@ -84,7 +87,7 @@ var Spawner = {
         }
         else{
             if(!spawn.spawning){
-                console.log('waiting on energy to spawn: ' + next_spawn.memory.role + '\tenergy required: ' + BodyCost(next_spawn.body));
+                utils.log('waiting on energy to spawn: ' + next_spawn.memory.role + '\tenergy required: ' + BodyCost(next_spawn.body));
             }
         }
 	},

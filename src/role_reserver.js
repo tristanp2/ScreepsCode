@@ -11,6 +11,8 @@
  *      Reservers are spawned when reserve targets exist
  */
 
+var utils = require('utilities');
+
 var reserver = {
     run: function(creep, room_info){
         if(!creep.memory.route || creep.memory.route < 0){
@@ -27,7 +29,7 @@ var reserver = {
                 creep.moveTo(creep.room.controller);
             }
             else if(result != OK){
-                console.log(creep.name + ' encountered unhandled error: ' + result);
+                utils.log(creep.name + ' encountered unhandled error: ' + result);
             }
             else{
                 creep.memory.reserved = true;

@@ -7,7 +7,85 @@
  * mod.thing == 'a thing'; // true
  */
 
+ const showStackTrace = true;
+ const stackTraceLimit = 1;
+ const printWidth = 120;
+function log() {
+    if(showStackTrace && arguments.length > 0)
+    {
+        Error.stackTraceLimit = stackTraceLimit + 1;
+        var location = (new Error("Stack trace")).stack;
+        location = location.split('\n').splice(2)
+                .map(s => '\t' + s.split(/[()]/)[1])
+                .join('\n');
+
+        if(stackTraceLimit == 1) {
+            let argsString = Array.from(arguments).join(' ');
+            let padding;
+            if(argsString.length < printWidth)
+                padding = new Array(printWidth - argsString.length).join(' ');
+            else
+                padding = ' ';
+
+            console.log(argsString + padding + location);
+        }
+        else {
+            console.log(...arguments);
+            console.log(location);
+        }
+    }
+    else
+        console.log();
+}
+var JobType = {
+    REPAIR: 0,
+    CONSTRUCT: 1,
+}
+function Job(){
+    this.id = -1;
+    this.ticksElapsed = 0;
+    this.finished = false;
+    this.workers = [];
+    this.num_workers = 0;
+    this.required_creeps = 0;
+    this.completion = undefined;
+    this.type = -1;
+    this.init = function(id, roomname, type, num_creeps, completion){
+        this.id = id;
+        this.type = type;
+        this.roomname = roomname;
+        this.required_creeps = num_creeps;
+        this.completion = completion;
+    };
+}
+
+function Queue() {
+    var a = [], b = 0;
+    this.getLength = function ()
+    { return a.length - b };
+    this.isEmpty = function ()
+    { return 0 == a.length };
+    this.enqueue = function (b) { a.push(b) };
+    this.dequeue = function ()
+    {
+        if (0 != a.length)
+        {
+            var c = a[b]; 2 * ++b >= a.length && (a = a.slice(b), b = 0);
+            return c;
+        }
+    };
+    this.peek = function () { return 0 < a.length ? a[b] : void 0 }
+}
+function isDefense(structure){
+    return structure.structureType == STRUCTURE_RAMPART || structure.structureType == STRUCTURE_WALL;
+}
+
 var utilities = {
+    log: log,
+    isDefense: isDefense,
+    Queue: Queue,
+    Job: Job,
+    JobType: JobType,
     get_most_open_adjacent_pos: function(pos){
         var adj_info = this.get_adjacent_pos_info(pos);
         var max = 0;

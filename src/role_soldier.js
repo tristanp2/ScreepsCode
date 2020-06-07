@@ -1,3 +1,5 @@
+var utils = require('utilities');
+
 var roleSoldier = {
 
     /** @param {Creep} creep **/

@@ -1,4 +1,5 @@
 var source_manager = require('source_handling');
+var utils = require('utilities');
 
 var roleBuilder = {
 
@@ -35,13 +36,13 @@ var roleBuilder = {
 	    	if(!target){
 	    		if(creep.memory.defense_pos){
 	    			var pos = creep.memory.defense_pos;
-	    			console.log('looking for rampart at '  + pos.x + ' ' + pos.y);
+	    			utils.log('looking for rampart at '  + pos.x + ' ' + pos.y);
 	    			//this works
 	    			targets = creep.room.lookForAt(LOOK_STRUCTURES, parseInt(pos.x), parseInt(pos.y));
 	    			var found = false;
 	    			for (var i in targets) {
 	    			    var targ = targets[i];
-	    			    console.log('Rampart? ' + targ);
+	    			    utils.log('Rampart? ' + targ);
 	    			    if (targ.structureType == STRUCTURE_RAMPART) {
 	    			        creep.memory.target_id = targ.id;
 	    			        creep.memory.afterbuild = true;
@@ -50,7 +51,7 @@ var roleBuilder = {
 	    			    }
 	    			}
 	    			if(!found){
-	    				//console.log('rampart not found')
+	    				//utils.log('rampart not found')
 	    				//something has gone wrong?
 	    				creep.memory.target_id = 0;
 	    				creep.memory.afterbuild = false;
@@ -76,7 +77,7 @@ var roleBuilder = {
             if(target){
             	var result;
             	if(creep.memory.afterbuild){
-            		//console.log('attempting repair');
+            		//utils.log('attempting repair');
             		result = creep.repair(target);
             		if(target.hits > 800 || result == ERR_INVALID_TARGET){
             			creep.memory.target_id = 0;
@@ -85,14 +86,14 @@ var roleBuilder = {
             		}
             	}
                 else{
-                	//console.log('attempting build');
+                	//utils.log('attempting build');
             	    result = creep.build(target);
                 }
-                //console.log('move cond ' + (result == ERR_NOT_IN_RANGE));
-                //console.log('move cond: ' + result + ' == ' + ERR_NOT_IN_RANGE);
-                //console.log(target);
+                //utils.log('move cond ' + (result == ERR_NOT_IN_RANGE));
+                //utils.log('move cond: ' + result + ' == ' + ERR_NOT_IN_RANGE);
+                //utils.log(target);
                 if(result == ERR_NOT_IN_RANGE){
-                	//console.log('moving?');
+                	//utils.log('moving?');
                 	creep.moveTo(target);
                 }
             }

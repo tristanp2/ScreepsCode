@@ -6,50 +6,9 @@ var roleSlave = require('role_slave');
 var roleSoldier =  require('role_soldier');
 var roleReserver = require('role_reserver');
 var towerDefense = require('tower_defense');
-var utilities = require('utilities');
+var utils = require('utilities');
 var spawner = require('spawner');
 
-var jobType = {
-    REPAIR: 0,
-    CONSTRUCT: 1,
-}
-function Job(){
-    this.id = -1;
-    this.ticksElapsed = 0;
-    this.finished = false;
-    this.workers = [];
-    this.num_workers = 0;
-    this.required_creeps = 0;
-    this.completion = undefined;
-    this.type = -1;
-    this.init = function(id, roomname, type, num_creeps, completion){
-        this.id = id;
-        this.type = type;
-        this.roomname = roomname;
-        this.required_creeps = num_creeps;
-        this.completion = completion;
-    };
-}
-function Queue() {
-    var a = [], b = 0;
-    this.getLength = function ()
-    { return a.length - b };
-    this.isEmpty = function ()
-    { return 0 == a.length };
-    this.enqueue = function (b) { a.push(b) };
-    this.dequeue = function ()
-    {
-        if (0 != a.length)
-        {
-            var c = a[b]; 2 * ++b >= a.length && (a = a.slice(b), b = 0);
-            return c;
-        }
-    };
-    this.peek = function () { return 0 < a.length ? a[b] : void 0 }
-}
-function isDefense(structure){
-    return structure.structureType == STRUCTURE_RAMPART || structure.structureType == STRUCTURE_WALL;
-}
 var roomBehaviour = {
     /********
     * Properties
@@ -103,9 +62,9 @@ var roomBehaviour = {
         
         for(var i in this.room.memory.reserve_targets){
             var name = this.room.memory.reserve_targets[i];
-            console.log(name + '?');
+            utils.log(name + '?');
             if(Memory.reserved_rooms[name]){
-                console.log('deleting from targs');
+                utils.log('deleting from targs');
                 this.room.memory.reserve_targets.splice(i,1);
             }
         }
@@ -116,17 +75,17 @@ var roomBehaviour = {
                 if(name){
                     var dist = Game.map.getRoomLinearDistance(this.room.name, name);
                     if(dist < 3){
-                        console.log('adding ' + name + ' to reserve_targets');
+                        utils.log('adding ' + name + ' to reserve_targets');
                         this.room.memory.reserve_targets.push(name);
-                        console.log(this.room.memory.reserve_targets);
+                        utils.log(this.room.memory.reserve_targets);
                         Memory.to_reserve.splice(i,1);
                     }
                     else{
-                        console.log(name + ' too far\tdist: ' + dist);
+                        utils.log(name + ' too far\tdist: ' + dist);
                     }
                 }
                 else{
-                    console.log(name + ' reserve target not found');
+                    utils.log(name + ' reserve target not found');
                     Memory.to_reserve.splice(i,1);
                 }
             }
@@ -166,20 +125,20 @@ var roomBehaviour = {
             this.room.memory.remove_structure = '';
         }
         else if(this.room.memory.remove_structure != ''){
-            console.log('-----------------------------------------------');
+            utils.log('-----------------------------------------------');
             var id = this.room.memory.remove_structure;
             var struct = Game.getObjectById(id);
             this.room.memory.remove_structure = '';
             if(struct && this.room.memory.rebuild_structures[struct.id]){
-                console.log(typeof(struct));
-                console.log('deleting ' + struct.id + ' in ' + this.room.name);
+                utils.log(typeof(struct));
+                utils.log('deleting ' + struct.id + ' in ' + this.room.name);
                 struct.destroy();
                 delete Memory.rooms[this.room.name].rebuild_structures[struct.id];
             }
             else{
-                console.log('could not locate structure with id: ' + id);
+                utils.log('could not locate structure with id: ' + id);
             }
-            console.log('-----------------------------------------------');
+            utils.log('-----------------------------------------------');
         }
         //Temporary. Planning to automatically place construction sites at destroyed structures
         //But this maybe should wait until I implement job delegation for builders
@@ -190,7 +149,7 @@ var roomBehaviour = {
                 var result = this.room.createConstructionSite(parseInt(mem.pos.x), parseInt(mem.pos.y), mem.type);
                 Game.notify(mem.type + ' is missing. creating construction site at ' + JSON.stringify(mem.pos) + 
                 ' \nResult is: ' + result);
-                console.log(id + ' is missing. creating construction site at ' + JSON.stringify(mem.pos) + 
+                utils.log(id + ' is missing. creating construction site at ' + JSON.stringify(mem.pos) + 
                 ' \nResult is: ' + result);
                 delete this.room.memory.rebuild_structures[id];
             }
@@ -198,7 +157,7 @@ var roomBehaviour = {
         for(var id in this.room.memory.sources){
             var source = Game.getObjectById(id);
             if(source && !source.memory.container_id){
-                var container_pos = utilities.get_most_open_adjacent_pos(source.pos);
+                var container_pos = utils.get_most_open_adjacent_pos(source.pos);
                 var structs = container_pos.lookFor(LOOK_STRUCTURES);
                 var sites = container_pos.lookFor(LOOK_CONSTRUCTION_SITES);
                 if(sites.length > 0)
@@ -216,10 +175,10 @@ var roomBehaviour = {
                     Game.getObjectById(container_id).memory.resource_type = RESOURCE_ENERGY;
                 }
                 else{
-                    console.log('no containers found for source: ' + source.id);
-                    console.log('attempting to create construction site at: ' + JSON.stringify(container_pos));
+                    utils.log('no containers found for source: ' + source.id);
+                    utils.log('attempting to create construction site at: ' + JSON.stringify(container_pos));
                     var result = this.room.createConstructionSite(container_pos, STRUCTURE_CONTAINER);
-                    console.log('result is: ' + result);
+                    utils.log('result is: ' + result);
                 }
             }
             else if(source){
@@ -244,8 +203,8 @@ var roomBehaviour = {
                 cont.memory.occupied = false;
             }
         }
-        console.log('defensehits: ' + this.defenseHits);
-        console.log('num_defenses: ' + num_defenses);
+        utils.log('defensehits: ' + this.defenseHits);
+        utils.log('num_defenses: ' + num_defenses);
         if(num_defenses == 0){
             this.defenseHits = 2000;
             this.room.memory.defenseHits = this.defenseHits;
@@ -254,10 +213,12 @@ var roomBehaviour = {
             this.defenseHits *= 2;
             this.room.memory.defenseHits = this.defenseHits;
         }
-        console.log(this.room.name + '---> h:' + harvesters.length + ' b:' + builders.length + ' u:' + upgraders.length 
+        utils.log(this.room.name + '---> h:' + harvesters.length + ' b:' + builders.length + ' u:' + upgraders.length 
                     + ' rp:' + repairers.length + ' rs:' + reservers.length  + ' sl:' + slaves.length+ ' so:' + soldiers.length);
         
         var floor_resource = this.room.find(FIND_DROPPED_RESOURCES);
+        utils.log('floor resources: ' + floor_resource.length);
+
         
         var room_info = {num_builders: builders.length, num_harvesters: harvesters.length, num_slaves: slaves.length,
                         num_upgraders: upgraders.length, num_repairers: repairers.length, num_containers: this.room.memory.num_containers,
@@ -268,7 +229,7 @@ var roomBehaviour = {
         }
         for(var name in this.room.creeps) {
             var creep = this.room.creeps[name];
-            //console.log(creep.name +  ': ' + creep.memory.role);
+            //utils.log(creep.name +  ': ' + creep.memory.role);
             if(creep.memory.role == 'harvester') {
                 roleHarvester.run(creep, room_info);
             }
@@ -301,7 +262,7 @@ var roomBehaviour = {
                 towerDefense.run(tower);
             }
         }
-        console.log('Remaining urgent repairs: ' + this.urgent);
+        utils.log('Remaining urgent repairs: ' + this.urgent);
     },
     make_roads: function(){
           
@@ -315,8 +276,12 @@ var roomBehaviour = {
     manage_sources: function(){
         
     },
+    manage_construction: function() {
+        this.constructionQ = new utils.Queue();
+        var active_jobs = Memory.active_jobs
+    },
     manage_repairs: function(){
-        this.repairsQ = new Queue();
+        this.repairsQ = new utils.Queue();
         var active_jobs = Memory.active_jobs;
         if (this.urgent == undefined)
             this.urgent =  0;
@@ -326,11 +291,11 @@ var roomBehaviour = {
         else {
             for (var i in active_jobs) {
                 var job = active_jobs[i];
-                if (job.type == jobType.REPAIR) {
+                if (job.type == utils.JobType.REPAIR) {
                     var struct = Game.getObjectById(job.id);
-                   // console.log('Onogoing repair: ' + job.id);
-                   // console.log('Hits: ' + struct.hits);
-                   // console.log('Completion' + job.completion);
+                   // utils.log('Onogoing repair: ' + job.id);
+                   // utils.log('Hits: ' + struct.hits);
+                   // utils.log('Completion' + job.completion);
                     if (!struct || struct.hits > job.completion) {
                         delete active_jobs[i];
                     }
@@ -341,8 +306,8 @@ var roomBehaviour = {
         //this seems to explode the callstack
         /**
         var high_priority = _.filter(this.structures,   (structure) =>  !active_jobs[structure.id] 
-                                                                    &&  (isDefense(structure) && structure.hits < 300) 
-                                                                    ||  (!isDefense(structure) && structure.hits < structure.hitsMax/3));
+                                                                    &&  (utils.isDefense(structure) && structure.hits < 300) 
+                                                                    ||  (!utils.isDefense(structure) && structure.hits < structure.hitsMax/3));
         Note to self: don't do that (wish there were macros)*/
 
         var high_priority = _.filter(this.structures,   (structure) =>  !active_jobs[structure.id] && structure.hits!=undefined 
@@ -353,27 +318,27 @@ var roomBehaviour = {
                                                                     ||  (!(structure.structureType == STRUCTURE_WALL || structure.structureType == STRUCTURE_RAMPART) && structure.hits < 2*structure.hitsMax/3)));
         for (var i in high_priority) {
             var structure = high_priority[i];
-            var job = new Job();
+            var job = new utils.Job();
             var completion;
             
-            if(isDefense(structure)){
+            if(utils.isDefense(structure)){
                 if(this.defenseHits < 10000)
                     completion = this.defenseHits;
                 else
                     completion = 10000;
                     
                 if (completion < structure.hits) {
-                    console.log('Invalid in hp');
-                    console.log(structure);
-                    console.log('hits: ' + structure.hits);
-                    console.log('comp: ' + completion);
+                    utils.log('Invalid in hp');
+                    utils.log(structure);
+                    utils.log('hits: ' + structure.hits);
+                    utils.log('comp: ' + completion);
                     continue;
                 }
             }
             else{
                 completion = structure.hitsMax;
             }
-            job.init(structure.id, this.room.name, jobType.REPAIR, 2, completion);
+            job.init(structure.id, this.room.name, utils.JobType.REPAIR, 2, completion);
             this.repairsQ.enqueue(job);
         }
         this.urgent = high_priority.length;
@@ -381,31 +346,31 @@ var roomBehaviour = {
         for(var i in the_rest){
             var structure = the_rest[i];
             if (structure.hits < structure.hitsMax) {
-                var job = new Job();
+                var job = new utils.Job();
                 var completion;
-                if (isDefense(structure)) {
+                if (utils.isDefense(structure)) {
                     completion = 2 * this.defenseHits;
                     if (completion < structure.hits) {
-                        console.log('Invalid in lp');
-                        console.log('Invalid in hp');
-                        console.log(structure);
-                        console.log('hits: ' + structure.hits);
-                        console.log('comp: ' + completion);
+                        utils.log('Invalid in lp');
+                        utils.log('Invalid in hp');
+                        utils.log(structure);
+                        utils.log('hits: ' + structure.hits);
+                        utils.log('comp: ' + completion);
                         continue;
                     }
                 }
                 else{
                     completion = structure.hitsMax;
                 }
-                job.init(structure.id, this.room.name, jobType.REPAIR, 1, completion);
+                job.init(structure.id, this.room.name, utils.JobType.REPAIR, 1, completion);
                 //This line is the problem
                 //this.repairsQ.push(job);
                 this.repairsQ.enqueue(job)                
-                //console.log('leaving problem code')
+                //utils.log('leaving problem code')
             }
         }
-        console.log(the_rest.length);
-        console.log('Repairs: ' + this.repairsQ.getLength());
+        utils.log(the_rest.length);
+        utils.log('Repairs: ' + this.repairsQ.getLength());
     }
 };
 module.exports = roomBehaviour;
