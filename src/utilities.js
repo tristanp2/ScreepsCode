@@ -35,7 +35,7 @@ function log() {
         }
     }
     else
-        console.log();
+        console.log(...arguments);
 }
 var JobType = {
     REPAIR: 0,

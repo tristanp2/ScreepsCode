@@ -16,15 +16,18 @@ var utils = require('utilities');
 var reserver = {
     run: function(creep, room_info){
         if(!creep.memory.route || creep.memory.route < 0){
+            utils.log("reserving");
             creep.memory.reserved = false;
             creep.memory.route = Game.map.findRoute(creep.room, creep.memory.target_room);
         }
         else if(creep.room.name != creep.memory.target_room){
+            utils.log("moving", creep.room.name);
             var exit = creep.pos.findClosestByRange(creep.memory.route[0].exit);
             creep.moveTo(exit)
         }
         else{
             var result = creep.reserveController(creep.room.controller)
+            utils.log('moving to controller')
             if(result == ERR_NOT_IN_RANGE){
                 creep.moveTo(creep.room.controller);
             }

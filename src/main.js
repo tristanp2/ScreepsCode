@@ -1,11 +1,11 @@
 var roomBehaviour = require('room_behaviour');
-var utils = require('utilities');
+var utilities = require('utilities');
 Source.prototype.memory = undefined;
 StructureContainer.prototype.memory = undefined;
 
 
 module.exports.loop = function () {
-    utils.log('------------TICK START-----------');
+    console.log('------------TICK START-----------');
     global.username = 'tpart';
     var num_harvesters = 6;
     var num_builders = 6;
@@ -27,7 +27,7 @@ module.exports.loop = function () {
         Memory.reserve_input = '';
     }
     else if(Memory.reserve_input != ''){
-        utils.log('Reserve input found');
+        console.log('Reserve input found');
         Memory.to_reserve.push(Memory.reserve_input);
         Memory.reserve_input = '';
     }
@@ -78,9 +78,18 @@ module.exports.loop = function () {
                 delete Memory.creeps[name]
             }
     }
+    var childRooms;
+
+    if(Memory.child_rooms)
+        childRooms = new Set(Array.from(Memory.child_rooms));
+    else
+        childRooms = new Set();
+
     for(var roomName in Game.rooms){
-        utils.log('------------' + roomName + ' START-----------');
         var room = Game.rooms[roomName];
+        if(childRooms.has(roomName) || !room.controller.my) continue;
+
+        console.log('------------' + roomName + ' START-----------');
         room.spawn = _.filter(Game.spawns, (spawn) => spawn.room.name == roomName)[0];
         room.creeps = room.find(FIND_MY_CREEPS);
         room.structures = room.find(FIND_STRUCTURES);
@@ -198,7 +207,7 @@ module.exports.loop = function () {
         }
         Memory.cpu_avg = used*alpha + Memory.cpu_avg*(1-alpha);
     }
-    utils.log('avg cpu usage: ' + Memory.cpu_avg);
-    utils.log('------------TICK END-----------');
-    utils.log();
+    console.log('avg cpu usage: ' + Memory.cpu_avg);
+    console.log('------------TICK END-----------');
+    console.log();
 }

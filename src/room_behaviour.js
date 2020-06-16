@@ -6,6 +6,7 @@ var roleSlave = require('role_slave');
 var roleSoldier =  require('role_soldier');
 var roleReserver = require('role_reserver');
 var towerDefense = require('tower_defense');
+var childRoomBehaviour = require('child_room_behaviour');
 var utils = require('utilities');
 var spawner = require('spawner');
 
@@ -40,6 +41,8 @@ var roomBehaviour = {
             room.memory.reserve_targets = [];
         }
         this.defenseHits = room.memory.defenseHits;
+
+        this.childRooms = this.updateChildRooms()
     },
     run: function(){
         this.manage_repairs();
@@ -256,6 +259,8 @@ var roomBehaviour = {
             }
            // creep.say(creep.memory.role[0]);
         }
+
+        this.manage_children();
         if(hostiles_present){
             for(var i in towers){
                 var tower = towers[i];
@@ -275,6 +280,19 @@ var roomBehaviour = {
     },
     manage_sources: function(){
         
+    },
+    manage_children: function() {
+        for(let i in this.room.memory.child_rooms) {
+            let roomName = this.room.memory.child_rooms[i];
+
+            let roomObj = Game.rooms[roomName];
+            if(roomObj) {
+                roomObj.creeps = roomObj.find(FIND_MY_CREEPS);
+                utils.log('------ Child room ' + roomName + ' start ------');
+                childRoomBehaviour.init(roomObj);
+                childRoomBehaviour.run();
+            }
+        }
     },
     manage_construction: function() {
         this.constructionQ = new utils.Queue();
@@ -369,8 +387,44 @@ var roomBehaviour = {
                 //utils.log('leaving problem code')
             }
         }
-        utils.log(the_rest.length);
         utils.log('Repairs: ' + this.repairsQ.getLength());
+    },
+    updateChildRooms: function() {
+        var globalChildRooms;
+        if(!Memory.child_rooms) {
+            globalChildRooms = new Set()
+        }
+        else
+            globalChildRooms = new Set(Array.from(Memory.child_rooms));
+
+        if(!this.room.memory.child_rooms) {
+            this.room.memory.child_rooms = [];
+
+            var neighbours = Game.map.describeExits(this.room.name);
+            var validNeighbours = [];
+            utils.log("finding neighbours");
+
+            for(let i in neighbours) {
+                let neighbour = neighbours[i];
+
+                let res = Game.map.getRoomStatus(neighbour);
+                utils.log(neighbour, res.status);
+                if(res.status != 'closed')
+                    validNeighbours.push(neighbour);
+            }
+
+            this.room.memory.child_rooms = validNeighbours;
+        }
+
+
+        for(let i in this.room.memory.child_rooms) {
+            let roomName = this.room.memory.child_rooms[i];
+            globalChildRooms.add(roomName);
+        }
+
+        Memory.child_rooms = Array.from(globalChildRooms);
+            
+        return this.room.memory.child_rooms;
     }
 };
 module.exports = roomBehaviour;
